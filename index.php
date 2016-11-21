@@ -9,6 +9,10 @@ $l = new g\Loader;
 $r = $h->fetch($u);
 $r = $f->filter($r);
 $d = $l->loader($r);
+$d->product_url = $u;
+$d->external_url = $u;
+echo $d;
+
 
 $s = "logs/pages/".preg_replace("/[\?\#].+/i","",basename($u));
 file_put_contents($s,$r);

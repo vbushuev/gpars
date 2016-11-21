@@ -2,7 +2,9 @@
 function __autoload($className){
 	$sourceDir = "/Applications/AMPPS/www/gpars/src";
 	$vendorDir = "/Applications/AMPPS/www/gpars/vendor";
-	$classmap = [];
+	$classmap = [
+		"phpQuery" => $vendorDir."/phpquery/phpQuery/phpQuery.php"
+	];
 	if(isset($classmap[$className])){
 		require_once $classmap[$className];
 		return true;

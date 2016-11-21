@@ -12,6 +12,9 @@ class Filter extends Common{
         $r = $s;
         $r = preg_replace("/(\\r\\n)(\\r\\n)+/i","$1",$r);
         $r = preg_replace("/(\\n)(\\n)+/i","$1",$r);
+        $r = preg_replace("/\<\!doctype.+?\>/i","",$r);
+        $r = preg_replace("/\<\!\-\-([\S\s]+?)\-\-\>/im","",$r);
+        $r = preg_replace("/\<script([\S\s]+?)\<\/script>/im","",$r);
         return $r;
     }
 };

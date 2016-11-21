@@ -17,7 +17,7 @@ class Common{
         if(isset($this->$n))$this->$n=$v;
     }
     public function __toString(){
-        return json_encode($this,JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
+        return json_encode(get_object_vars($this),JSON_PRETTY_PRINT|JSON_UNESCAPED_UNICODE);
     }
     public function checkPath($p){
         $pi = pathinfo($p);
