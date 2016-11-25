@@ -1,6 +1,9 @@
 <?php
 namespace g;
 class Product extends Common{
+    protected $code;
+    protected $connector=null;
+    /*
     protected $shop = "ctshirts.com";
     protected $currency = "GBP";
     protected $original_price = "";
@@ -17,10 +20,15 @@ class Product extends Common{
     protected $variations = [];
     protected $attributes = [];
     protected $status = "";
-    public function __set($n,$v){
-        $v = preg_replace("/^\\n/","",$v);
-        $v = preg_replace("/\\n$/","",$v);
-        if(isset($this->$n))$this->$n=$v;
+    */
+    public function __construct(){
+        $this->connector = new \g\Connector();
     }
+    public function __set($n,$v){
+        $v = preg_replace("/^\\n/m","",$v);
+        $v = preg_replace("/\\n$/m","",$v);
+        $this->_properties[$n]=$v;
+    }
+
 };
 ?>
