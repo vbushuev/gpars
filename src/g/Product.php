@@ -2,6 +2,7 @@
 namespace g;
 class Product extends Common{
     protected $code;
+    protected $db;
     protected $connector=null;
     /*
     protected $shop = "ctshirts.com";
@@ -21,8 +22,10 @@ class Product extends Common{
     protected $attributes = [];
     protected $status = "";
     */
+    protected $tr = null;
     public function __construct(){
         $this->connector = new \g\Connector();
+        $this->db = new \g\DBConnector();
     }
     public function __set($n,$v){
         $v = preg_replace("/^\\n/m","",$v);

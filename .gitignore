@@ -1,3 +1,13 @@
 
 logs/*
 vendor/*
+
+categories.json
+
+categories.new.json
+
+*.csv
+
+ctshirts.categories.json
+
+ctshirts.tags.json

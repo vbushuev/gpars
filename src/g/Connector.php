@@ -18,7 +18,9 @@ class Connector extends Common{
         $host = parse_url($url);
         $curlOptions = [
             CURLOPT_URL => $url,
-            //CURLOPT_HTTPHEADER=>$headers,
+            CURLOPT_HTTPHEADER=>[
+                'Cookie: CTCountry=gb; GlobalE_Data='.urlencode('{"countryISO":"gb","cultureCode":"ru","currencyCode":"GBP","apiVersion":"2.1.4","clientSettings":"{"AllowClientTracking":{"Value":"true"},"FullClientTracking":{"Value":"true"},"IsMonitoringMerchant":{"Value":"true"},"IsV2Checkout":{"Value":"true"}}"}')
+            ],
             CURLOPT_RETURNTRANSFER => true,
             CURLOPT_FOLLOWLOCATION => 1,
             CURLOPT_MAXREDIRS =>20, // останавливаться после 10-ого редиректа
@@ -30,7 +32,7 @@ class Connector extends Common{
             //CURLINFO_HEADER_OUT => 1,
         ];
 
-        $method = $_SERVER['REQUEST_METHOD'];
+        //$method = $_SERVER['REQUEST_METHOD'];
         if($this->config["proxy"]!==false){
             $curlOptions[CURLOPT_PROXY] = $this->config["proxy"];
         }

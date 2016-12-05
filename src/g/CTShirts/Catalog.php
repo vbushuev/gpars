@@ -30,6 +30,7 @@ class Catalog extends Common{
                     $pe2 = pq($e2);
                     $t2 = Common::stripText($pe2->text());
                     $l2 = Common::stripText($pe2->attr("href"));
+                    if(preg_match("/view all/i",$t2))continue;
                     if(strlen($t2))$r[$t]["l"][$t2]=["u"=>$l2,"l"=>$this->linker->get($l2)];
                 }
             }
