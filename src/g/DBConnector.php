@@ -9,10 +9,10 @@ class DBConnector extends Common{
     protected $connected=false;
     protected $conn=null;
         public function __construct(){
-            $this->host="garan";
-            $this->user="gauzymall";
-            $this->pass="D6a8O2e1";
-            $this->schema="gauzymall";
+            $this->host="127.0.0.1";
+            $this->user="gpars";
+            $this->pass="gpars";
+            $this->schema="gpars";
             $this->prefix="xr_";
             $this->connected=false;
             $this->conn=null;

@@ -64,7 +64,7 @@ class Product extends \g\Product{
             [
                 "name"=>"Оригинальное описание",
                 "slug"=>"original_description",
-                "position" => 1,
+                "position" => 3,
                 "visible" => false,
                 "variation" =>false,
                 "options" => $p["description"]
@@ -72,7 +72,7 @@ class Product extends \g\Product{
             [
                 "name"=>"Оригинальная ссылка",
                 "slug"=>"original_url",
-                "position" => 1,
+                "position" => 4,
                 "visible" => false,
                 "variation" =>false,
                 "options" => $p["product_url"]
@@ -80,7 +80,7 @@ class Product extends \g\Product{
             [
                 "name"=>"Оригинальная категория",
                 "slug"=>"original_category",
-                "position" => 1,
+                "position" => 5,
                 "visible" => false,
                 "variation" =>false,
                 "options" => $c
@@ -180,10 +180,13 @@ class Product extends \g\Product{
         $op["description"] = preg_replace("/\'/m","\\'",$op["description"]);
         try{
             if(!$this->db->exists("select 1 from g_product where sku='".$op["sku"]."'")){
-                $this->db->insert("insert into g_product(rawdata,shop,title,categories,description,original_price,currency,sku,url) values(
-                    '".$data."','ctshirts.com','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','GBP','".$op["sku"]."','".$op["product_url"]."')");
+                $this->db->insert("insert into g_product(rawdata,shop,shop_url,brand,title,categories,description,original_price,currency,sku,url) values(
+                    '".$data."','ctshirts','www.ctshirts.com','Charles Tyrwhitt','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','GBP','".$op["sku"]."','".$op["product_url"]."')");
             }else {
                 $this->db->insert("update g_product set
+                    shop = 'ctshirts',
+                    shop_url = 'www.ctshirts.com',
+                    brand = 'Charles Tyrwhitt',
                     rawdata = '".$data."',
                     title = '".$op["title"]."',
                     categories ='".join(' | ',$op["categories"])."',
@@ -191,10 +194,11 @@ class Product extends \g\Product{
                     original_price ='".$op["original_price"]."',
                     currency = 'GBP',
                     url = '".$op["product_url"]."',
-                    status = 0
+                    status = 'new'
                     where sku='".$op["sku"]."'");
             }
-        }catch(\Exception $e){
+        }
+        catch(\Exception $e){
             Log::debug($entry." error load".$e->getMessage());
         }
         //return  $this->connector->fetch("http://service.garan24.bs2/prod/create","POST",Common::json($this->d));

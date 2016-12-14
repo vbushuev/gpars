@@ -2,10 +2,14 @@
 namespace g;
 class Translator extends Common{
     protected $_d = [];
+    protected $db;
     public function __construct($cfg){
+        $this->db = new \g\DBConnector();
         $this->setLang($cfg);
+
     }
     public function setLang($cfg){
+        $dict = $this->db->selectAll("select * from g_dictionary where lang='".$cfg["lang"]."' order by priority desc");
         $dict_fname = "dicts/".$cfg["lang"].".php";
         if(file_exists($dict_fname)){
             include($dict_fname);

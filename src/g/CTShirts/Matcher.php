@@ -50,6 +50,8 @@ class Matcher extends \g\Product{
     public function storewoo(){
         $data = preg_replace('/\\//im',"/",Common::json($this->d));
         $r = $this->connector->fetch("http://service.garan24.bs2/prod/create","POST",$data);
+        //$r = $this->connector->fetch("http://l.gauzymall.com/prod/create","POST",$data);
+        $this->db->insert("update g_product set status=2 where sku = '".$this->d["sku"]."'");
         \g\Log::debug($r);
     }
     public function matcher(){
@@ -65,6 +67,7 @@ class Matcher extends \g\Product{
             case "Accessories": $cat_name = "Акксессуары ";break;
             case "Womenswear": $cat_name = "Женская одежда ";break;
         }
+        $this->d["short_description"] = $this->tr->translate($this->d["title"]);
         //$this->d["title"] = $cat_name."Charles Tyrwhitt - ".$this->tr->translate($this->d["title"]);
         $this->d["title"] = "Charles Tyrwhitt - ".$this->d["title"];
         $cats = $this->getCategories();
@@ -75,12 +78,18 @@ class Matcher extends \g\Product{
         $this->gettags($o_cat);
 
 
+        //$this->d["status"] = preg_replace('/<h3(.+?)h3>/im',"",$this->d["description"]);
         $this->d["description"] = preg_replace('/<h3(.+?)h3>/im',"",$this->d["description"]);
         $this->d["description"] = preg_replace('/\s*class\s*="(.+?)"/im',"",$this->d["description"]);
         $this->d["description"] = $this->tr->translate($this->d["description"]);
-        $this->d["short_description"] = $this->d["description"];
+
         $this->d["product_url"] = preg_replace("/www\.ctshirts\.com/","ctshirts.gauzymall.com",$this->d["product_url"]);
         $this->d["product_url"] = preg_replace("/\/intl\//","/uk/",$this->d["product_url"]);
+        /*$this->d['custom_meta'] = [
+            'eg-original-price' => $this->d["regular_price"] ,
+            'eg-original-price-currency' => "GBP" ,
+        ];*/
+        $this->d["status"] = "publish";
     }
     protected function getparents($id){
         $r = [];
@@ -88,7 +97,7 @@ class Matcher extends \g\Product{
             if($c["parent"]>0){
                 $r = array_merge($r,$this->getparents($c["parent"]));
             }
-            $r[] = $id;
+            $r[] = $id;//["id"=>$id];
         }
         return $r;
     }
