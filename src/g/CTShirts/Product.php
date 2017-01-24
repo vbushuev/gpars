@@ -19,11 +19,17 @@ class Product extends \g\Product{
         $p["product_url"]  = $u;
         $p["original_price"] = Common::stripNumber($r->find("#pdpMain")->find(".price.price__display:first")->text());
         $p["regular_price"] = Common::stripNumber($r->find("#pdpMain")->find(".price.price__display:first")->text());
+        $sale = $r->find("#pdpMain")->find(".price.price__display.sale")->text();
+        $sale = preg_replace("/[\r\n]+/m","",$sale);
+        $sale = preg_replace("/.*Now\s*£(\d+\.\d+)/im","$1",$sale);
+        $sale = Common::stripNumber($sale);
+        $p["sale_price"] = ($p["regular_price"]==$sale)?"0":$sale;
+
         $p["title"] =Common::stripText($r->find("#pdpMain")->find(".product-name.pdp-main__name:first")->text());
         if(!strlen($p["title"]))$p["title"] =Common::stripText($r->find("#pdpMain")->find(".product-set__name.product-set__name--main")->text());
         $p["short_description"] = Common::stripText(preg_replace("/[\r\n]+/","",pq("#wrapper > div:nth-child(5) > div.pdp-main__slot.js-accordion > div.pdp-main__slot.pdp-main__slot--shadowed.pdp-main__slot--full > div.pdp-main__slot.pdp-main__slot--left-group.pdp-main__slot--border-right > div.pdp-main__slot--outlined.pdp-main__slot--outlined-blue.js-slot-accordion.pdp-main__slot--accordion")->html()));
         $p["description"] = Common::stripText(preg_replace("/[\r\n]+/","",pq("#wrapper > div:nth-child(5) > div.pdp-main__slot.js-accordion > div.pdp-main__slot.pdp-main__slot--shadowed.pdp-main__slot--full > div.pdp-main__slot.pdp-main__slot--left-group.pdp-main__slot--border-right > div.pdp-main__slot--outlined.pdp-main__slot--outlined-blue.js-slot-accordion.pdp-main__slot--accordion")->html()));
-        $p["sku"] = $this->code.preg_replace("/[\r\n]+/","",$r->find("#pdpMain")->find(".pdp-main__number span[itemprop='productID']:first")->text());
+        $p["sku"] = preg_replace("/[\r\n]+/","",$r->find("#pdpMain")->find(".pdp-main__number span[itemprop='productID']:first")->text());
         $p["type"] = "external";
         $p["images"] = [];
         $p["categories"] = [];
@@ -168,7 +174,7 @@ class Product extends \g\Product{
             ];
         }
         $this->d = $p;
-        file_put_contents("logs/pages/".$this->d["sku"].".html",$s);
+        //file_put_contents("logs/pages/".$this->d["sku"].".html",$s);
         $this->store();
         return $p;
     }
@@ -180,18 +186,20 @@ class Product extends \g\Product{
         $op["description"] = preg_replace("/\'/m","\\'",$op["description"]);
         try{
             if(!$this->db->exists("select 1 from g_product where sku='".$op["sku"]."'")){
-                $this->db->insert("insert into g_product(rawdata,shop,shop_url,brand,title,categories,description,original_price,currency,sku,url) values(
-                    '".$data."','ctshirts','www.ctshirts.com','Charles Tyrwhitt','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','GBP','".$op["sku"]."','".$op["product_url"]."')");
+                $this->db->insert("insert into g_product(rawdata,shop,shop_url,brand,title,categories,description,original_price,regular_price,sale_price,currency,sku,url) values(
+                    '".$data."','ctshirts','www.ctshirts.com','Charles Tyrwhitt','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','".$op["regular_price"]."','".$op["sale_price"]."','GBP','".$op["sku"]."','".$op["product_url"]."')");
             }else {
                 $this->db->insert("update g_product set
+                    updated = CURRENT_TIMESTAMP,
                     shop = 'ctshirts',
-                    shop_url = 'www.ctshirts.com',
+                    shop_url = 'shop1.gauzymall.com',
                     brand = 'Charles Tyrwhitt',
                     rawdata = '".$data."',
                     title = '".$op["title"]."',
                     categories ='".join(' | ',$op["categories"])."',
                     description = '".$op["description"]."',
                     original_price ='".$op["original_price"]."',
+                    sale_price ='".$op["sale_price"]."',
                     currency = 'GBP',
                     url = '".$op["product_url"]."',
                     status = 'new'

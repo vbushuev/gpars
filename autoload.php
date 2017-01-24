@@ -1,8 +1,8 @@
 <?php
 date_default_timezone_set('Europe/Moscow');
 function __autoload($className){
-	$sourceDir = "/Applications/AMPPS/www/gpars/src";
-	$vendorDir = "/Applications/AMPPS/www/gpars/vendor";
+	$sourceDir = "src";
+	$vendorDir = "vendor";
 	$classmap = [
 		"phpQuery" => $vendorDir."/phpquery/phpQuery/phpQuery.php"
 	];

@@ -159,25 +159,28 @@ class cmatcher{
     }
 };
 $cm = new cmatcher();
-$dirs = ["logs/data","logs/data.1"];
 $tick = time();
 echo "Start in ".date("H:i:s")."\n";
 try{
     //get products
     //$ops = $db->selectAll("select * from g_product where status in ('translated')");
-    $ops = $db->selectAll("select * from g_product where status = 'new'");
+    $ops = $db->selectAll("select * from g_product where shop='ctshirts' and status = 'new'");
+    echo count($ops)." products\n";
     foreach ($ops as $op) {
-        $o_c = preg_split("/\s\/\s/",$op["categories"]);
+        $o_c = preg_split("/\s\|\s/",$op["categories"]);
+        $o_c = [$o_c[0],$o_c[1]];
         $g_cs = $cm->match($o_c);
-        //print_r($g_cs);exit;
-        $g_c = [];
-        $g_c_id = [];
-        $g_url = preg_replace("/http(s*)\:\/\/(.+?)\.(.+?)\.(.+?)\//i","http://$3.gauzymall.com/",$op["url"]);
-        foreach ($g_cs as $gcc) {
-            $g_c[] = $gcc["name"];
-            $g_c_id[] = $gcc["id"];
+        echo join("/",$o_c)." -> ".join("/",$g_cs)." \n";
+        if(count($g_cs)){
+            $g_c = [];
+            $g_c_id = [];
+            $g_url = preg_replace("/http(s*)\:\/\/(.+?)\.(.+?)\.(.+?)\//i","http://shop1.gauzymall.com/",$op["url"]);
+            foreach ($g_cs as $gcc) {
+                $g_c[] = $gcc["name"];
+                $g_c_id[] = $gcc["id"];
+            }
+            $db->update("update g_product set g_categories='".join(" / ",$g_c)."',g_categories_id='".join(" / ",$g_c_id)."',status='categories',g_url='".$g_url."' where id=".$op["id"]);
         }
-        $db->update("update g_product set g_categories='".join(" / ",$g_c)."',g_categories_id='".join(" / ",$g_c_id)."',status='categories',g_url='".$g_url."' where id=".$op["id"]);
     }
 }
 catch(\Exception $e){

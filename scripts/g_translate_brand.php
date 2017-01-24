@@ -17,15 +17,23 @@ function tr($s,$dict,$type="text"){
     return $r;
 }
 try{
-    //get dictionary
-    $dict = $db->selectAll("select * from g_dictionary where lang='fr' order by priority desc");
     //get products
     //$ops = $db->selectAll("select * from g_product where status in ('new')");
-    $ops = $db->selectAll("select * from g_product where status='categories'");
+    $ops = $db->selectAll("select * from g_product where shop='brandalley' and status='categories'");
     foreach ($ops as $op) {
-        $g_t = preg_replace('/[\\\']/im', '\\\'',$tr->translate($op["title"],$dict,"title"));
-        $g_d = preg_replace('/[\\\']/im', '\\\'',$tr->translate($op["description"],$dict));
-
+        $g_t = preg_replace('/[\\\']/im', '\\\'',$tr->translate($op["title"]));
+        $g_d = preg_replace('/[\\\']/im', '\\\'',$tr->translate($op["description"]));
+        $g_d = preg_replace('/\<\!\-\-(.+?)\-\->/im', "",$g_d);
+        $g_d = preg_replace('/[\r\n]+/im', "",$g_d);
+        $g_d = preg_replace('/référence:\s*\d+/im', "",$g_d);
+        $g_d = preg_replace('/caractéristiques|paiement sécurisé/im', "",$g_d);
+        $g_d = preg_replace('/\<(.+?)\>\s*([^\<]+)\<(.+?)\>/im', "\n$2\n",$g_d);
+        $g_d = preg_replace('/\<(.+?)\>/im', "",$g_d);
+        $g_d = preg_replace('/\<([^\>]+)$/im', "",$g_d);
+        $g_d = preg_replace('/\s*\n\s*\n/im', "",$g_d);
+        //$g_d = trim(preg_replace('/\<(.+?)\>([^\<]+)\<(.+?)\>/im', "<li>$2</li>",$g_d));
+        $g_d = preg_replace('/^\s*(.+)\s*$/im', "<li>$1</li>",$g_d);
+        $g_d = "<ul>".$g_d."</ul>";
         $db->update("update g_product set g_title='".$g_t."',g_description='".$g_d."',g_sku='".$op["sku"]."',status='translated' where id=".$op["id"]);
     }
 }

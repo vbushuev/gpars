@@ -10,7 +10,7 @@ echo "Start in ".date("H:i:s")."\n";
 try{
     //get products
     //$ops = $db->selectAll("select * from g_product where status in ('translated')");
-    $ops = $db->selectAll("select * from g_product where status = 'new'");
+    $ops = $db->selectAll("select * from g_product where status = 'new' and shop='brandalley'");
     foreach ($ops as $op) {
         $cm = new Matcher($op);
         $g_cs = $cm->matcher();

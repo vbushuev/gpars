@@ -2,9 +2,10 @@
 include("autoload.php");
 use g\Log as Log;
 use g\Common as Common;
-//use g\CTShirts\Catalog as Catalog;
-use g\Brandalley\Catalog as Catalog;
-use g\Brandalley\Product as Product;
+use g\CTShirts\Catalog as Catalog;
+use g\CTShirts\Product as Product;
+//use g\Brandalley\Catalog as Catalog;
+//use g\Brandalley\Product as Product;
 //use g\Brandalley\Matcher as Matcher;
 //$u = "http://www.ctshirts.com/uk/slim-fit-button-down-collar-non-iron-business-casual-white-shirt/FOB0188WHT.html#cgid=shirts-business-casual-shirts&start=1";
 //$pl = new g\ProductGetter($u);
@@ -15,7 +16,7 @@ Log::$console=false;
 Log::debug($cc);
 Log::$console=true;
 print_r($cc);
-/*
+exit;
 foreach($cc as $k=>$d){
     foreach($d["l"] as $kk=>$dd){
         foreach ($dd["l"] as $p) {

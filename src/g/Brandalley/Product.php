@@ -25,7 +25,7 @@ class Product extends \g\Product{
         $p["type"] = "external";
         $p["brand"] = Common::stripText($r->find("#col-right > div.col_right_haut > h1 > a")->text());
         $p["title"] =Common::stripText($r->find("#col-right > div.col_right_haut > h1 > span")->text());
-        $p["description"] =Common::stripText($r->find("#description_produit")->html());
+        $p["description"] =Common::stripText($r->find("#description_produit > div")[0]->html());
         $p["original_price"] = Common::stripNumber($r->find("#block_price > span.price_stroke.font_trade_gothic.regular-price")->text());
         $p["regular_price"] = Common::stripNumber($r->find("#price > span.pull-left.font_trade_gothic.price.current-price")->text());
         $p["sale_price"] = Common::stripNumber($r->find("#price > span.pull-left.font_trade_gothic.price.current-price")->text());
@@ -33,7 +33,7 @@ class Product extends \g\Product{
         foreach($r->find("#mainImage .slide") as $img){
             $pe = pq($img);
             $p["images"][]=[
-                "src"=>preg_replace("/\?.*$/","",$pe->find("a img")->attr("src")),
+                "src"=>"http:".preg_replace("/\?.*$/","",$pe->find("a img")->attr("src")),
                 "position"=>count($p["images"])
             ];
         }
@@ -129,7 +129,7 @@ class Product extends \g\Product{
                 $this->db->insert("insert into g_product(rawdata,shop,shop_url,brand,title,categories,description,original_price,currency,sku,url,regular_price,sale_price,images) values(
                     '".$data."','BrandAlley','www-v6.brandalley.fr','".$op["brand"]."','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','EUR','".$op["sku"]."','".$op["product_url"]."',
                     '".$op["regular_price"]."','".$op["sale_price"]."',
-                    '".join(' | ', $imgs)."')");
+                    '".join(',', $imgs)."')");
             }else {
                 $this->db->insert("update g_product set
                     shop = 'BrandAlley',

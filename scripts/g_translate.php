@@ -25,6 +25,9 @@ function tr($s,$dict,$type="text"){
                 'пиджак для дорожного костюма',
                 'брюки для дорожного костюма',
                 'плащ для дорожного костюма',
+                'жилет для дорожного костюма',
+                'жилет для делового костюма',
+                'жилет для роскошного костюма',
                 'подарочная коробка носков',
                 'пижамные брюки',
                 'джемпер с воротником',
@@ -55,7 +58,7 @@ try{
     $dict = $db->selectAll("select * from g_dictionary where lang='en' order by priority desc");
     //get products
     //$ops = $db->selectAll("select * from g_product where status in ('new')");
-    $ops = $db->selectAll("select * from g_product");
+    $ops = $db->selectAll("select * from g_product where shop='ctshirts' and status = 'categories'");
     foreach ($ops as $op) {
         $g_t = preg_replace('/[\\\']/im', '\\\'',tr($op["title"],$dict,"title"));
         $g_d = preg_replace('/[\\\']/im', '\\\'',tr($op["description"],$dict));
