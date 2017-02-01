@@ -39,6 +39,7 @@ class Common{
     }
     public static function stripText($s){
         $r = trim($s);
+        $r = preg_replace("/'/","''",$r);
         return $r;
     }
     public static function stripNumber($s){

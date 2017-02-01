@@ -25,8 +25,10 @@ try{
         $g_d = preg_replace('/[\\\']/im', '\\\'',$tr->translate($op["description"]));
         $g_d = preg_replace('/\<\!\-\-(.+?)\-\->/im', "",$g_d);
         $g_d = preg_replace('/[\r\n]+/im', "",$g_d);
+        $g_d = preg_replace('/<h2>(.+?)<\/h2>/im', "",$g_d);
         $g_d = preg_replace('/référence:\s*\d+/im', "",$g_d);
         $g_d = preg_replace('/caractéristiques|paiement sécurisé/im', "",$g_d);
+
         $g_d = preg_replace('/\<(.+?)\>\s*([^\<]+)\<(.+?)\>/im', "\n$2\n",$g_d);
         $g_d = preg_replace('/\<(.+?)\>/im', "",$g_d);
         $g_d = preg_replace('/\<([^\>]+)$/im', "",$g_d);

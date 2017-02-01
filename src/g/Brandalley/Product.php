@@ -5,31 +5,31 @@ use \g\Log as Log;
 class Product extends \g\Product{
     protected $d=[];
     protected $c_matcher = [];
+    protected $shopName = 'BrandAlley';
     public function __construct($a = []){
         parent::__construct();
         $this->code = "BRA";
         $this->c_matcher = json_decode(file_get_contents("categories.json"),true);
     }
-    public function get($u,$c){
+    public function parse($u,$c,$s){
         $p = [];
-        $s = $this->connector->fetch($u);
-
         $r = \phpQuery::newDocument($s);
         $p["product_url"]  = $u;
 
         $p["sku"] = $this->code.preg_replace("/[\D]+/","",preg_replace("/^(.+?)\/([^\/]+)$/","$2",$u));
-        echo "\t\t\tSKU:[".$p["sku"]."]\n";
+        //echo "\t\t\tSKU:[".$p["sku"]."]\n";
         $p["images"] = [];
         $p["categories"] = $c;
         $p["variations"] = [];
         $p["type"] = "external";
         $p["brand"] = Common::stripText($r->find("#col-right > div.col_right_haut > h1 > a")->text());
-        $p["title"] =Common::stripText($r->find("#col-right > div.col_right_haut > h1 > span")->text());
-        $p["description"] =Common::stripText($r->find("#description_produit > div")[0]->html());
-        $p["original_price"] = Common::stripNumber($r->find("#block_price > span.price_stroke.font_trade_gothic.regular-price")->text());
-        $p["regular_price"] = Common::stripNumber($r->find("#price > span.pull-left.font_trade_gothic.price.current-price")->text());
-        $p["sale_price"] = Common::stripNumber($r->find("#price > span.pull-left.font_trade_gothic.price.current-price")->text());
+        $p["title"] =preg_replace("/[\r\n]+/im"," ",Common::stripText($r->find("#col-right > div.col_right_haut > h1 > span")->text()));
+        $p["description"] =preg_replace("/[\r\n]+/im"," ",Common::stripText($r->find("#description_produit > div")[0]->html()));
+        $p["original_price"] = Common::stripNumber($r->find("#block_price > span.price_stroke.regular-price")->text());
+        $p["regular_price"] = Common::stripNumber($r->find("#price > span.pull-left.price.current-price")->text());
+        $p["sale_price"] = Common::stripNumber($r->find("#price > span.pull-left.price.current-price")->text());
 
+        if(count(trim($p["original_price"]))==0)return null;
         foreach($r->find("#mainImage .slide") as $img){
             $pe = pq($img);
             $p["images"][]=[
@@ -114,6 +114,19 @@ class Product extends \g\Product{
         $this->store();
         return $p;
     }
+    public function get($u,$c){
+        $s = $this->connector->fetch($u);
+        return $this->parse($u,$c,$s);
+    }
+    public function getMulti($u,$c){
+        $pp = [];
+        $ss = $this->connector->fetchMulti($u);
+        foreach($ss as $url=>$s){
+            $p = $this->parse($url,$c,$s);
+            if($p!=null) $pp[] = $p;
+        }
+        return $pp;
+    }
     public function store(){
         //file_put_contents("logs/data/".$this->d["sku"].".json",preg_replace('/\\//im',"/",Common::json($this->d)));//->__toString());
         $data = preg_replace("/\'/m","\\'",Common::json($this->d));
@@ -125,15 +138,14 @@ class Product extends \g\Product{
             foreach($op["images"] as $img){
                 $imgs[]=$img["src"];
             }
-            if(!$this->db->exists("select 1 from g_product where sku='".$op["sku"]."'")){
+            if(!$this->db->exists("select 1 from g_product where sku='".$op["sku"]."' and shop='".$this->shopName."'")){
                 $this->db->insert("insert into g_product(rawdata,shop,shop_url,brand,title,categories,description,original_price,currency,sku,url,regular_price,sale_price,images) values(
-                    '".$data."','BrandAlley','www-v6.brandalley.fr','".$op["brand"]."','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','EUR','".$op["sku"]."','".$op["product_url"]."',
+                    '".$data."','".$this->shopName."','www.brandalley.fr','".$op["brand"]."','".$op["title"]."','".join(' | ',$op["categories"])."','".$op["description"]."','".$op["original_price"]."','EUR','".$op["sku"]."','".$op["product_url"]."',
                     '".$op["regular_price"]."','".$op["sale_price"]."',
                     '".join(',', $imgs)."')");
             }else {
                 $this->db->insert("update g_product set
-                    shop = 'BrandAlley',
-                    shop_url = 'www-v6.brandalley.fr',
+                    shop_url = 'www.brandalley.fr',
                     brand = '".$op["brand"]."',
                     rawdata = '".$data."',
                     title = '".$op["title"]."',
@@ -144,9 +156,9 @@ class Product extends \g\Product{
                     sale_price ='".$op["sale_price"]."',
                     currency = 'EUR',
                     url = '".$op["product_url"]."',
-                    status = 'new',
-                    images = '".join(' | ', $imgs)."'
-                    where sku='".$op["sku"]."'");
+                    status = 'updated',
+                    images = '".join(',', $imgs)."'
+                    where sku='".$op["sku"]."' and shop = '".$this->shopName."'");
             }
         }
         catch(\Exception $e){
