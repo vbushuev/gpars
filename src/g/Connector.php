@@ -42,6 +42,7 @@ class Connector extends Common{
         }
         curl_setopt_array($curl, $curlOptions);
         $response = curl_exec($curl);
+        $this->_properties["http_info"] = curl_getinfo($curl);
         curl_close($curl);
         return $response;
     }
@@ -74,12 +75,14 @@ class Connector extends Common{
             curl_multi_exec($mh, $running);
             curl_multi_select($mh);
         } while ($running > 0);
-
+        //$this->_properties["http_info"]=curl_multi_info_read($mh);
         // Obtendo dados de todas as consultas e retirando da fila
         foreach($curls as $url=>$curl){
             $response[$url]=curl_multi_getcontent($curl);
+            $this->_properties["http_info"][$url] = curl_getinfo($curl);
             curl_multi_remove_handle($mh, $curl);
         }
+
         curl_multi_close($mh);
         return $response;
     }

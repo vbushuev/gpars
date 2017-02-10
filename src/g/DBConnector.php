@@ -9,11 +9,11 @@ class DBConnector extends Common{
     protected $connected=false;
     protected $conn=null;
         public function __construct(){
-            $this->host="127.0.0.1";
-            $this->user="gpars";
-            $this->pass="gpars";
-            $this->schema="gpars";
-            $this->prefix="xr_";
+            $this->_properties["host"]="127.0.0.1";
+            $this->_properties["user"]="gpars";
+            $this->_properties["pass"]="gpars";
+            $this->_properties["schema"]="gpars";
+            $this->_properties["prefix"]="xr_";
             $this->connected=false;
             $this->conn=null;
         }
@@ -21,7 +21,7 @@ class DBConnector extends Common{
             if($this->connected) $this->conn->close();
         }
         protected function connect(){
-            $this->conn = new \mysqli($this->host,$this->user,$this->pass,$this->schema);
+            $this->conn = new \mysqli($this->_properties["host"],$this->_properties["user"],$this->_properties["pass"],$this->_properties["schema"]);
             //GARAN24::debug($this->_dbdata);
             if($this->conn->connect_errno) throw new Exception("No db connection. Error:".$this->conn->connect_error);
             $this->connected = true;
@@ -37,10 +37,10 @@ class DBConnector extends Common{
         }
         protected function _prefixed($sql){
             $r = $sql;
-            $r = preg_replace("/(from|join|into|update)\s+([a-z0-9_]+)/im","$1 ".$this->prefix."$2",$r);
-            //$r = preg_replace("/join\s+([a-z0-9_]+)/im","join ".$this->prefix."$1",$r);
-            //$r = preg_replace("/into\s+([a-z0-9_]+)/im","into ".$this->prefix."$1",$r);
-            //$r = preg_replace("/update\s+([a-z0-9_]+)/im","update ".$this->prefix."$1",$r);
+            $r = preg_replace("/(from|join|into|update)\s+([a-z0-9_]+)/im","$1 ".$this->_properties["prefix"]."$2",$r);
+            //$r = preg_replace("/join\s+([a-z0-9_]+)/im","join ".$this->_properties["prefix"]."$1",$r);
+            //$r = preg_replace("/into\s+([a-z0-9_]+)/im","into ".$this->_properties["prefix"]."$1",$r);
+            //$r = preg_replace("/update\s+([a-z0-9_]+)/im","update ".$this->_properties["prefix"]."$1",$r);
             return $r;
         }
         public function select($sql){

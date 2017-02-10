@@ -14,7 +14,7 @@ class Common{
         }
     }
     public function __get($n){
-        return isset($this->_properties[$n])?$this->$this->_properties[$n]:false;
+        return isset($this->_properties[$n])?$this->_properties[$n]:false;
     }
     public function __set($n,$v){
         $this->_properties[$n]=$v;

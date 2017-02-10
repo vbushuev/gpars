@@ -110,7 +110,7 @@ class Product extends \g\Product{
             ];
         }
         $this->d = $p;
-        file_put_contents("logs/pages/".$this->d["sku"].".html",$s);
+        //file_put_contents("logs/pages/".$this->d["sku"].".html",$s);
         $this->store();
         return $p;
     }
