@@ -19,6 +19,9 @@ $sleeped = 2;
 try{
     $i = 0;
     $post_id = 0;
+    if(file_exists("post_id.php")){
+        include("post_id.php");
+    }
     //get products
     $products = $db->selectAll("select p.*, m.meta_value from xr_posts p join xr_postmeta m on m.post_id = p.id where p.post_type = 'product' and m.meta_key = '_product_url' and p.post_status = 'publish' and p.id> ".$post_id." order by p.id");
     //$products = $db->selectAll("select p.*, m.meta_value from xr_posts p join xr_postmeta m on m.post_id = p.id where p.post_type = 'product' and m.meta_key = '_product_url' and p.post_status = 'publish' limit 10");
@@ -28,6 +31,7 @@ try{
         $url = preg_replace("/http:\/\/g-ct\.gauzymall\.com/i","http://www.ctshirts.com",$product["meta_value"]);
         $url = preg_replace("/http:\/\/shop1\.gauzymall\.com/i","http://www.ctshirts.com",$url);
         $url = preg_replace("/http:\/\/g-ba\.gauzymall\.com/i","https://www.brandalley.fr",$url);
+        $url = preg_replace("/http:\/\/brandalley\.gauzymall\.com/i","https://www.brandalley.fr",$url);
         $urls[]=$url;
         $pps[$url] = $product["ID"];
         $post_id = $product["ID"];
@@ -39,21 +43,23 @@ try{
                 if($value["http_code"] == "0"){
                     echo "0 code for ".$url."\n";
                 }
+                //echo $value["http_code"]."\t".$url."\n";
                 if($value["http_code"] == "404"){
                     if(isset($pps[$url])){
                         $to_remove[] = $pps[$url];
                         $total_removed++;
                     }
-                }
 
+                }
                 //echo "check HTTP ".$value["http_code"]." ".$url."\n";
             }
             if(count($to_remove)){
-                echo ("update xr_posts set post_status='trash' where id in (".join(',',$to_remove).")"."\n");break;
+                echo ("update xr_posts set post_status='trash' where id in (".join(',',$to_remove).")"."\n");
                 echo "Remove ids: ".join(',',$to_remove)."\n";
                 $db->update("update xr_posts set post_status='trash' where id in (".join(',',$to_remove).")");
             }
             echo "next 100 links checked\n";
+            file_put_contents("post_id.php",'<?php $post_id = '.$post_id.';?>');
             $i=0;
             $urls = [];
         }
@@ -64,6 +70,5 @@ try{
 catch(\Exception $e){
     Log::debug("Error ".$e->getMessage());
 }
-//echo "End in  ".date("H:i:s")."\n";
 echo $total_removed." of ".$total." in ". (time()-$tick)." seconds\n";
 ?>
